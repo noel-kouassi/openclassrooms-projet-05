@@ -1,5 +1,5 @@
 import {HttpClientModule} from '@angular/common/http';
-import {TestBed} from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatCardModule} from '@angular/material/card';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
@@ -17,19 +17,34 @@ jest.mock('../../services/user.service');
 
 describe('MeComponent', () => {
   let component: MeComponent;
+  let fixture: ComponentFixture<MeComponent>;
   let userServiceMock: jest.Mocked<UserService>;
   let matSnackBarMock: jest.Mocked<MatSnackBar>;
   let sessionServiceMock: jest.Mocked<SessionService>;
   let routerMock: jest.Mocked<Router>;
 
-  const mockSessionService = {
-    sessionInformation: {
-      admin: true,
-      id: 1
-    }
-  }
-
   beforeEach(async () => {
+    userServiceMock = {
+      delete: jest.fn() as jest.MockedFunction<typeof userServiceMock.delete>,
+      getById: jest.fn() as jest.MockedFunction<typeof userServiceMock.getById>
+    } as jest.Mocked<UserService>;
+
+    sessionServiceMock = {
+      sessionInformation: {
+        admin: true,
+        id: 1
+      },
+      logOut: jest.fn() as jest.MockedFunction<typeof sessionServiceMock.logOut>
+    } as jest.Mocked<SessionService>;
+
+    matSnackBarMock = {
+      open: jest.fn() as jest.MockedFunction<typeof matSnackBarMock.open>
+    } as jest.Mocked<MatSnackBar>;
+
+    routerMock = {
+      navigate: jest.fn() as jest.MockedFunction<typeof routerMock.navigate>
+    } as jest.Mocked<Router>;
+
     await TestBed.configureTestingModule({
       declarations: [MeComponent],
       imports: [
@@ -40,35 +55,27 @@ describe('MeComponent', () => {
         MatIconModule,
         MatInputModule
       ],
-      providers: [{provide: SessionService, useValue: mockSessionService}],
+      providers: [
+        {provide: SessionService, useValue: sessionServiceMock},
+        {provide: UserService, useValue: userServiceMock},
+        {provide: MatSnackBar, useValue: matSnackBarMock},
+        {provide: Router, useValue: routerMock}
+      ],
     })
       .compileComponents();
 
-    userServiceMock = {} as jest.Mocked<UserService>;
-    userServiceMock.delete = jest.fn();
-    userServiceMock.getById = jest.fn();
-
-    matSnackBarMock = {} as jest.Mocked<MatSnackBar>;
-    matSnackBarMock.open = jest.fn();
-
-    sessionServiceMock = mockSessionService as jest.Mocked<SessionService>;
-    sessionServiceMock.logOut = jest.fn();
-
-    routerMock = {} as jest.Mocked<Router>;
-    routerMock.navigate = jest.fn();
-
-    component = new MeComponent(routerMock, sessionServiceMock, matSnackBarMock, userServiceMock);
+    fixture = TestBed.createComponent(MeComponent);
+    component = fixture.componentInstance;
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should retrieve user when loading page with ngOnInit', () => {
+  it('should retrieve user on page loading with ngOnInit', () => {
 
     // Given
-    let mockUser: User = {} as User;
-    mockUser.id = 1;
+    let mockUser: User = {id: 1} as User;
 
     // When
     userServiceMock.getById.mockReturnValue(of(mockUser));
@@ -84,7 +91,7 @@ describe('MeComponent', () => {
 
   });
 
-  it('should go back in navigation when execute back function', () => {
+  it('should go back in navigation on back function execution', () => {
 
     // Given
     let mockHistoryBack = jest.spyOn(window.history as any, 'back');
@@ -96,7 +103,7 @@ describe('MeComponent', () => {
     expect(mockHistoryBack).toHaveBeenCalled();
   });
 
-  it('should delete user account, logout and make redirection after removal', () => {
+  it('should delete user account, logout and make redirection on removal action', () => {
 
     // Given
     userServiceMock.delete.mockReturnValue(of({}));

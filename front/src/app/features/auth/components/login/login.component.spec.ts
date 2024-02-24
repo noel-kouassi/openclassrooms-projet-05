@@ -1,42 +1,106 @@
-import { HttpClientModule } from '@angular/common/http';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterTestingModule } from '@angular/router/testing';
-import { expect } from '@jest/globals';
-import { SessionService } from 'src/app/services/session.service';
-
-import { LoginComponent } from './login.component';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {Router} from '@angular/router';
+import {FormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {of, throwError} from 'rxjs';
+import {LoginComponent} from './login.component';
+import {AuthService} from '../../services/auth.service';
+import {SessionService} from 'src/app/services/session.service';
+import {SessionInformation} from "../../../../interfaces/sessionInformation.interface";
+import {MatSnackBarModule} from "@angular/material/snack-bar";
+import {HttpClientModule} from "@angular/common/http";
+import {MatCardModule} from "@angular/material/card";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatIconModule} from "@angular/material/icon";
+import {MatInputModule} from "@angular/material/input";
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
+  let authServiceMock: jest.Mocked<AuthService>;
+  let routerMock: jest.Mocked<Router>;
+  let sessionServiceMock: jest.Mocked<SessionService>;
+
+  const sessionInformation = {
+    admin: true,
+    id: 1
+  }
+
+  const loginRequest= {
+    email: 'test@test.com',
+    password: 'user1234'
+  }
 
   beforeEach(async () => {
+    authServiceMock = {
+      login: jest.fn() as jest.MockedFunction<typeof authServiceMock.login>
+    } as jest.Mocked<AuthService>;
+
+    routerMock = {
+      navigate: jest.fn() as jest.MockedFunction<typeof routerMock.navigate>
+    } as jest.Mocked<Router>;
+
+    sessionServiceMock = {
+      logIn: jest.fn() as jest.MockedFunction<typeof sessionServiceMock.logIn>
+    } as jest.Mocked<SessionService>;
+
     await TestBed.configureTestingModule({
       declarations: [LoginComponent],
-      providers: [SessionService],
-      imports: [
-        RouterTestingModule,
-        BrowserAnimationsModule,
+      imports: [ReactiveFormsModule,
+        MatSnackBarModule,
         HttpClientModule,
         MatCardModule,
-        MatIconModule,
         MatFormFieldModule,
-        MatInputModule,
-        ReactiveFormsModule]
-    })
-      .compileComponents();
+        MatIconModule,
+        MatInputModule],
+      providers: [
+        {provide: AuthService, useValue: authServiceMock},
+        {provide: Router, useValue: routerMock},
+        {provide: SessionService, useValue: sessionServiceMock},
+        FormBuilder,
+      ],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should connect user and redirect on successful login', () => {
+
+    // Given
+    const loginResponse = sessionInformation as SessionInformation;
+    const navigateSpy = jest.spyOn(routerMock as any, 'navigate');
+
+    // When
+    authServiceMock.login.mockReturnValue(of(loginResponse));
+    component.form.setValue(loginRequest);
+
+    component.submit();
+
+    // Then
+    expect(authServiceMock.login).toHaveBeenCalledWith(loginRequest);
+    expect(sessionServiceMock.logIn).toHaveBeenCalledWith(loginResponse);
+    expect(navigateSpy).toHaveBeenCalledWith(['/sessions']);
+    expect(component.onError).toBeFalsy();
+  });
+
+  it('should set onError to true on login error', () => {
+
+    // Given
+    const errorMessage = 'Login failed';
+
+    // When
+    authServiceMock.login.mockReturnValue(throwError(errorMessage));
+    component.form.setValue(loginRequest);
+
+    component.submit();
+
+    // Then
+    expect(authServiceMock.login).toHaveBeenCalledWith(loginRequest);
+    expect(sessionServiceMock.logIn).not.toHaveBeenCalled();
+    expect(component.onError).toBeTruthy();
   });
 });
