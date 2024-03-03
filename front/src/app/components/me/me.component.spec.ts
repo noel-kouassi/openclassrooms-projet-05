@@ -1,5 +1,5 @@
 import {HttpClientModule} from '@angular/common/http';
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {MatCardModule} from '@angular/material/card';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
@@ -12,6 +12,7 @@ import {UserService} from "../../services/user.service";
 import {Router} from "@angular/router";
 import {of} from "rxjs";
 import {User} from "../../interfaces/user.interface";
+import {By} from "@angular/platform-browser";
 
 jest.mock('../../services/user.service');
 
@@ -25,9 +26,9 @@ describe('MeComponent', () => {
 
   beforeEach(async () => {
     userServiceMock = {
-      delete: jest.fn() as jest.MockedFunction<typeof userServiceMock.delete>,
-      getById: jest.fn() as jest.MockedFunction<typeof userServiceMock.getById>
-    } as jest.Mocked<UserService>;
+      delete: jest.fn(() => of(true)),
+      getById: jest.fn(() => of({firstName: 'Alex', lastName: 'Robert', email: 'alex.robert@test.com'} as User))
+    } as any as jest.Mocked<UserService>;
 
     sessionServiceMock = {
       sessionInformation: {
@@ -117,4 +118,63 @@ describe('MeComponent', () => {
     expect(sessionServiceMock.logOut).toHaveBeenCalled();
     expect(routerMock.navigate).toHaveBeenCalledWith(['/']);
   });
+
+  it('should print user information in the template', waitForAsync(() => {
+
+    // When
+    fixture.detectChanges();
+
+    // Then
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+
+      const nameElement = fixture.debugElement.query(By.css('p:first-child'));
+      expect(nameElement.nativeElement.textContent).toContain('Alex ROBERT');
+
+      const emailElement = fixture.debugElement.query(By.css('p:nth-child(2)'));
+      expect(emailElement.nativeElement.textContent).toContain('alex.robert@test.com');
+    });
+  }));
+
+  it('should print admin message when user is admin', waitForAsync(() => {
+
+    // When
+    userServiceMock.getById.mockReturnValue(of({
+      firstName: 'Admin',
+      lastName: 'User',
+      email: 'admin@test.com',
+      admin: true
+    } as User));
+
+    fixture.detectChanges();
+
+    // Then
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+
+      const adminMessageElement = fixture.debugElement.query(By.css('.my2'));
+      expect(adminMessageElement.nativeElement.textContent).toContain('You are admin');
+    });
+  }));
+
+  it('should print delete button when user is not admin', waitForAsync(() => {
+
+    // When
+    userServiceMock.getById.mockReturnValue(of({
+      firstName: 'Alex',
+      lastName: 'Robert',
+      email: 'alex.robert@test.com',
+      admin: false
+    } as User));
+
+    fixture.detectChanges();
+
+    // Then
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+
+      const deleteButton = fixture.debugElement.query(By.css('button[mat-raised-button]'));
+      expect(deleteButton).toBeTruthy();
+    });
+  }));
 });
