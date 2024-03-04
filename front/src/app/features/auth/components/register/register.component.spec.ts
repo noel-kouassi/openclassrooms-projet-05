@@ -1,5 +1,5 @@
 import {HttpClientModule} from '@angular/common/http';
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 import {FormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {MatCardModule} from '@angular/material/card';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -39,8 +39,7 @@ describe('RegisterComponent', () => {
         MatCardModule,
         MatFormFieldModule,
         MatIconModule,
-        MatInputModule
-      ],
+        MatInputModule],
       providers: [
         {provide: AuthService, useValue: authServiceMock},
         FormBuilder
@@ -86,4 +85,58 @@ describe('RegisterComponent', () => {
     expect(authServiceMock.register).toHaveBeenCalledWith(registerRequest);
     expect(component.onError).toBeTruthy();
   });
+
+  it('should verify the form elements display', () => {
+
+    // When
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement;
+
+    // Then
+    expect(compiled.querySelector('form')).toBeTruthy();
+    expect(compiled.querySelector('input[formControlName="firstName"]')).toBeTruthy();
+    expect(compiled.querySelector('input[formControlName="lastName"]')).toBeTruthy();
+    expect(compiled.querySelector('input[formControlName="email"]')).toBeTruthy();
+    expect(compiled.querySelector('input[formControlName="password"]')).toBeTruthy();
+    expect(compiled.querySelector('button[type="submit"]')).toBeTruthy();
+    expect(compiled.querySelector('.error')).toBeFalsy();
+  });
+
+  it('should not disable the submit button when the form is valid', fakeAsync(() => {
+
+    // Given
+    const form = component.form;
+    form.patchValue({
+      firstName: 'Test',
+      lastName: 'Alex',
+      email: 'alex.test@test.com',
+      password: 'test1234'
+    });
+
+    // When
+    fixture.detectChanges();
+    const submitButton = fixture.nativeElement.querySelector('button[type="submit"]');
+
+    // Then
+    expect(submitButton.disabled).toBeFalsy();
+  }));
+
+  it('should disable the submit button when the form is invalid', fakeAsync(() => {
+
+    // Given
+    const form = component.form;
+    form.patchValue({
+      firstName: '',
+      lastName: 'Alex',
+      email: 'alex.test@test.com',
+      password: 'test1234'
+    });
+
+    // When
+    fixture.detectChanges();
+    const submitButton = fixture.nativeElement.querySelector('button[type="submit"]');
+
+    // Then
+    expect(submitButton.disabled).toBeTruthy();
+  }));
 });
