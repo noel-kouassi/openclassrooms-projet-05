@@ -1,6 +1,6 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {Router} from '@angular/router';
-import {FormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {FormBuilder, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {of, throwError} from 'rxjs';
 import {LoginComponent} from './login.component';
 import {AuthService} from '../../services/auth.service';
@@ -12,6 +12,8 @@ import {MatCardModule} from "@angular/material/card";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatIconModule} from "@angular/material/icon";
 import {MatInputModule} from "@angular/material/input";
+import {MatButtonModule} from "@angular/material/button";
+import {CommonModule} from "@angular/common";
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -51,7 +53,10 @@ describe('LoginComponent', () => {
         MatCardModule,
         MatFormFieldModule,
         MatIconModule,
-        MatInputModule],
+        MatInputModule,
+        MatButtonModule,
+        CommonModule,
+        FormsModule],
       providers: [
         {provide: AuthService, useValue: authServiceMock},
         {provide: Router, useValue: routerMock},
@@ -103,4 +108,53 @@ describe('LoginComponent', () => {
     expect(sessionServiceMock.logIn).not.toHaveBeenCalled();
     expect(component.onError).toBeTruthy();
   });
+
+  it('should display login form with required elements', () => {
+    const compiled = fixture.nativeElement;
+
+    expect(compiled.querySelector('form')).toBeTruthy();
+    expect(compiled.querySelector('input[formControlName="email"]')).toBeTruthy();
+    expect(compiled.querySelector('input[formControlName="password"]')).toBeTruthy();
+    expect(compiled.querySelector('button[type="submit"]')).toBeTruthy();
+    expect(compiled.querySelector('.error')).toBeFalsy();
+  });
+
+  it('should toggle password visibility on button click', () => {
+    const compiled = fixture.nativeElement;
+    expect(compiled.querySelector('input[formControlName="password"]').type).toBe('text');
+  });
+
+  it('should bind form controls to the component', () => {
+
+    // Given
+    const emailInput = component.form.get('email');
+    const passwordInput = component.form.get('password');
+
+    // When
+    emailInput!.setValue('test@test.com');
+    passwordInput!.setValue('test1234');
+
+    // Then
+    expect(component.form.value.email).toEqual('test@test.com');
+    expect(component.form.value.password).toEqual('test1234');
+    expect(emailInput).toBeTruthy();
+    expect(passwordInput).toBeTruthy();
+  });
+
+  it('should verify submit action on click', () => {
+
+    // Given
+    const loginResponse = sessionInformation as SessionInformation;
+    const submitSpy = jest.spyOn(component, 'submit');
+
+    // When
+    authServiceMock.login.mockReturnValue(of(loginResponse));
+    component.form.setValue(loginRequest);
+
+    component.submit();
+
+    // Then
+    expect(submitSpy).toHaveBeenCalled();
+  });
+
 });
