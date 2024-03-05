@@ -1,6 +1,6 @@
 import {HttpClientModule} from '@angular/common/http';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatCardModule} from '@angular/material/card';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
@@ -19,6 +19,7 @@ import {TeacherService} from "../../../../services/teacher.service";
 import {of} from "rxjs";
 import {SessionInformation} from "../../../../interfaces/sessionInformation.interface";
 import {Session} from "../../interfaces/session.interface";
+import {CommonModule} from "@angular/common";
 
 describe('FormComponent', () => {
   let component: FormComponent;
@@ -46,16 +47,16 @@ describe('FormComponent', () => {
   } as Session;
 
   const mockSessionForm = {
-    value : mockSession
+    value: mockSession
   }
 
   beforeEach(async () => {
 
     activatedRouteMock = {
       snapshot: {
-            paramMap: {
-              get: jest.fn()
-            }
+        paramMap: {
+          get: jest.fn()
+        }
       },
       url: of([]),
     } as any as jest.Mocked<ActivatedRoute>;
@@ -96,7 +97,9 @@ describe('FormComponent', () => {
         ReactiveFormsModule,
         MatSnackBarModule,
         MatSelectModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
+        CommonModule,
+        FormsModule
       ],
       providers: [
         {provide: SessionService, useValue: mockSessionService},
@@ -125,7 +128,7 @@ describe('FormComponent', () => {
   it('should navigate to sessions page if user is not admin on initialization', () => {
 
     // Given
-    sessionServiceMock.sessionInformation = { admin: false } as SessionInformation;
+    sessionServiceMock.sessionInformation = {admin: false} as SessionInformation;
 
     // When
     component.ngOnInit();
@@ -137,7 +140,7 @@ describe('FormComponent', () => {
   it('should not navigate to sessions page if user is admin on initialization', () => {
 
     // Given
-    sessionServiceMock.sessionInformation = { admin: true } as SessionInformation;
+    sessionServiceMock.sessionInformation = {admin: true} as SessionInformation;
 
     // When
     component.ngOnInit();
@@ -159,7 +162,7 @@ describe('FormComponent', () => {
     // Then
     fixture.whenStable().then(() => {
       expect(sessionApiServiceMock.create).toHaveBeenCalledWith(component.sessionForm?.value);
-      expect(matSnackBarMock.open).toHaveBeenCalledWith('Session created !', 'Close', { duration: 3000 });
+      expect(matSnackBarMock.open).toHaveBeenCalledWith('Session created !', 'Close', {duration: 3000});
       expect(routerMock.navigate).toHaveBeenCalledWith(['sessions']);
     });
   }));
@@ -179,8 +182,48 @@ describe('FormComponent', () => {
     // Then
     fixture.whenStable().then(() => {
       expect(sessionApiServiceMock.update).toHaveBeenCalledWith('1', component.sessionForm?.value);
-      expect(matSnackBarMock.open).toHaveBeenCalledWith('Session updated !', 'Close', { duration: 3000 });
+      expect(matSnackBarMock.open).toHaveBeenCalledWith('Session updated !', 'Close', {duration: 3000});
       expect(routerMock.navigate).toHaveBeenCalledWith(['sessions']);
     });
   }));
+
+  it('should display create session title when not updating', () => {
+
+    // Given
+    const compiled = fixture.nativeElement;
+    component.onUpdate = false;
+
+    // When
+    fixture.detectChanges();
+
+    // Then
+    expect(compiled.querySelector('h1').textContent).toContain('Create session');
+  });
+
+  it('should display update session title when updating', () => {
+
+    // Given
+    const compiled = fixture.nativeElement;
+    component.onUpdate = true;
+
+    // When
+    fixture.detectChanges();
+
+    // Then
+    expect(compiled.querySelector('h1').textContent).toContain('Update session');
+  });
+
+  it('should disable save button when form is invalid', () => {
+
+    // Given
+    const compiled = fixture.nativeElement;
+
+    // When
+    fixture.detectChanges();
+    const saveButton = compiled.querySelector('button[mat-raised-button][color="primary"]');
+
+    // Then
+    expect(saveButton.disabled).toBeTruthy();
+  });
+
 });
