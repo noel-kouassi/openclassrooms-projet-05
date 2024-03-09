@@ -1,5 +1,5 @@
 import {HttpClientModule} from '@angular/common/http';
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {RouterTestingModule} from '@angular/router/testing';
 import {expect} from '@jest/globals';
@@ -8,6 +8,7 @@ import {AppComponent} from './app.component';
 import {Router} from "@angular/router";
 import {SessionService} from "./services/session.service";
 import {of} from "rxjs";
+import {By} from "@angular/platform-browser";
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -34,7 +35,8 @@ describe('AppComponent', () => {
       imports: [
         RouterTestingModule,
         HttpClientModule,
-        MatToolbarModule
+        MatToolbarModule,
+        RouterTestingModule.withRoutes([])
       ],
       declarations: [
         AppComponent
@@ -76,5 +78,14 @@ describe('AppComponent', () => {
     // Then
     expect(sessionServiceMock.logOut).toHaveBeenCalled();
     expect(routerMock.navigate).toHaveBeenCalledWith(['']);
+  });
+
+  it('should display the app title', () => {
+
+    // When
+    const titleElement = fixture.debugElement.query(By.css('span')).nativeElement;
+
+    // Then
+    expect(titleElement.textContent).toContain('Yoga app');
   });
 });
