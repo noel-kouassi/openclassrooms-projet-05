@@ -12,11 +12,13 @@ import {RegisterComponent} from './register.component';
 import {AuthService} from "../../services/auth.service";
 import {of, throwError} from "rxjs";
 import {RegisterRequest} from "../../interfaces/registerRequest.interface";
+import {Router} from "@angular/router";
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
   let authServiceMock: jest.Mocked<AuthService>;
+  let routerMock: jest.Mocked<Router>;
 
   const registerRequest = {
     email: 'test@test.com',
@@ -30,6 +32,10 @@ describe('RegisterComponent', () => {
       register: jest.fn() as jest.MockedFunction<typeof authServiceMock.register>
     } as jest.Mocked<AuthService>;
 
+    routerMock = {
+      navigate: jest.fn() as jest.MockedFunction<typeof routerMock.navigate>
+    } as jest.Mocked<Router>;
+
     await TestBed.configureTestingModule({
       declarations: [RegisterComponent],
       imports: [
@@ -42,10 +48,10 @@ describe('RegisterComponent', () => {
         MatInputModule],
       providers: [
         {provide: AuthService, useValue: authServiceMock},
+        {provide: Router, useValue: routerMock},
         FormBuilder
       ]
-    })
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(RegisterComponent);
     component = fixture.componentInstance;
@@ -139,4 +145,27 @@ describe('RegisterComponent', () => {
     // Then
     expect(submitButton.disabled).toBeTruthy();
   }));
+
+  it('should initialize form with right validators', () => {
+
+    // When
+    const formControls = component.form.controls;
+
+    // Then
+    expect(formControls.email.validator).toBeInstanceOf(Function);
+    expect(formControls.firstName.validator).toBeInstanceOf(Function);
+    expect(formControls.lastName.validator).toBeInstanceOf(Function);
+    expect(formControls.password.validator).toBeInstanceOf(Function);
+  });
+
+  it('should navigate to login on successful form submission', () => {
+
+    // When
+    authServiceMock.register.mockReturnValue(of(undefined));
+    component.submit();
+
+    // Then
+    expect(routerMock.navigate).toHaveBeenCalledWith(['/login']);
+  });
+
 });

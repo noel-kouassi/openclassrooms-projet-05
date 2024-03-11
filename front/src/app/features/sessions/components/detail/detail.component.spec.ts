@@ -112,10 +112,11 @@ describe('DetailComponent', () => {
     expect(mockHistoryBack).toHaveBeenCalled();
   });
 
-  it('should delete session and navigate to sessions', waitForAsync(() => {
+  it('should delete session and navigate to sessions', () => {
 
     // Given
     component.sessionId = '1';
+    sessionApiServiceMock.delete.mockReturnValue(of({}));
 
     // When
     component.delete();
@@ -126,7 +127,7 @@ describe('DetailComponent', () => {
       expect(matSnackBarMock.open).toHaveBeenCalledWith('Session deleted !', 'Close', {duration: 3000});
       expect(routerMock.navigate).toHaveBeenCalledWith(['sessions']);
     });
-  }));
+  });
 
   it('should participate to the session', waitForAsync(() => {
 
