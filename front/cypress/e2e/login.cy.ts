@@ -1,5 +1,7 @@
 describe('Login spec', () => {
+
   it('Login successful', () => {
+
     cy.visit('/login')
 
     cy.intercept('POST', '/api/auth/login', {
