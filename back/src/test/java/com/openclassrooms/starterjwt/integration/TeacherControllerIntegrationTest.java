@@ -4,10 +4,8 @@ import com.openclassrooms.starterjwt.controllers.TeacherController;
 import com.openclassrooms.starterjwt.dto.TeacherDto;
 import com.openclassrooms.starterjwt.models.Teacher;
 import com.openclassrooms.starterjwt.repository.TeacherRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +17,6 @@ import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class TeacherControllerIntegrationTest {
 
     @Autowired
@@ -27,11 +24,6 @@ public class TeacherControllerIntegrationTest {
 
     @Autowired
     private TeacherController teacherController;
-
-    @AfterEach
-    public void cleanUp() {
-        teacherRepository.deleteAll();
-    }
 
     @Test
     public void testFindById() {

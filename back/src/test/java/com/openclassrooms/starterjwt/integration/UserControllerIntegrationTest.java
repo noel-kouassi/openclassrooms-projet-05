@@ -6,10 +6,8 @@ import com.openclassrooms.starterjwt.dto.UserDto;
 import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.payload.request.LoginRequest;
 import com.openclassrooms.starterjwt.repository.UserRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +19,6 @@ import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class UserControllerIntegrationTest {
 
     @Autowired
@@ -35,11 +32,6 @@ public class UserControllerIntegrationTest {
 
     @Autowired
     private AuthController authController;
-
-    @AfterEach
-    public void cleanUp() {
-        userRepository.deleteAll();
-    }
 
     @Test
     public void testFindById() {

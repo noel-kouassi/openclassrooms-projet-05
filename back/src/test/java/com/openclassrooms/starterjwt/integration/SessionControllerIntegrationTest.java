@@ -9,11 +9,9 @@ import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.repository.SessionRepository;
 import com.openclassrooms.starterjwt.repository.TeacherRepository;
 import com.openclassrooms.starterjwt.repository.UserRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,27 +24,20 @@ import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class SessionControllerIntegrationTest {
 
+    private final List<User> users = new ArrayList<>();
     @Autowired
     private SessionRepository sessionRepository;
-
     @Autowired
     private TeacherRepository teacherRepository;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private SessionController sessionController;
-
     @Autowired
     private SessionMapper sessionMapper;
-
     private Teacher teacherSaved;
-
-    private final List<User> users = new ArrayList<>();
 
     @BeforeEach
     public void setUp() {
@@ -69,13 +60,6 @@ public class SessionControllerIntegrationTest {
         teacherSaved = teacherRepository.save(teacher);
         User userSaved = userRepository.save(user);
         users.add(userSaved);
-    }
-
-    @AfterEach
-    public void cleanUp() {
-        sessionRepository.deleteAll();
-        teacherRepository.deleteAll();
-        userRepository.deleteAll();
     }
 
     @Test

@@ -6,7 +6,6 @@ import com.openclassrooms.starterjwt.models.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.ArrayList;
@@ -18,21 +17,16 @@ import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class SessionRepositoryTest {
 
+    private final List<User> users = new ArrayList<>();
     @Autowired
     private SessionRepository sessionRepository;
-
     @Autowired
     private TeacherRepository teacherRepository;
-
     @Autowired
     private UserRepository userRepository;
-
     private Teacher teacherSaved;
-
-    private final List<User> users = new ArrayList<>();
 
     @BeforeEach
     public void setUp() {
