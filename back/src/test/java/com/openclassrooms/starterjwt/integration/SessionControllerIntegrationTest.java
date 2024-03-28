@@ -9,6 +9,7 @@ import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.repository.SessionRepository;
 import com.openclassrooms.starterjwt.repository.TeacherRepository;
 import com.openclassrooms.starterjwt.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,13 @@ public class SessionControllerIntegrationTest {
         teacherSaved = teacherRepository.save(teacher);
         User userSaved = userRepository.save(user);
         users.add(userSaved);
+    }
+
+    @AfterEach
+    public void cleanUp() {
+        sessionRepository.deleteAll();
+        teacherRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test

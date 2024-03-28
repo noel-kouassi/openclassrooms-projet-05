@@ -6,6 +6,7 @@ import com.openclassrooms.starterjwt.dto.UserDto;
 import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.payload.request.LoginRequest;
 import com.openclassrooms.starterjwt.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,6 +33,11 @@ public class UserControllerIntegrationTest {
 
     @Autowired
     private AuthController authController;
+
+    @AfterEach
+    public void cleanUp() {
+        userRepository.deleteAll();
+    }
 
     @Test
     public void testFindById() {
