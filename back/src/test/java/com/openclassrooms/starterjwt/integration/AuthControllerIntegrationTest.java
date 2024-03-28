@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -53,7 +54,7 @@ public class AuthControllerIntegrationTest {
         ResponseEntity<?> responseEntity = authController.authenticateUser(loginRequest);
 
         // Then
-        assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isInstanceOf(JwtResponse.class);
 
         JwtResponse jwtResponse = (JwtResponse) responseEntity.getBody();
@@ -79,7 +80,7 @@ public class AuthControllerIntegrationTest {
         ResponseEntity<?> responseEntity = authController.registerUser(signupRequest);
 
         // Then
-        assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isInstanceOf(MessageResponse.class);
 
         MessageResponse messageResponse = (MessageResponse) responseEntity.getBody();
@@ -107,7 +108,7 @@ public class AuthControllerIntegrationTest {
         ResponseEntity<?> responseEntity = authController.registerUser(signupRequest);
 
         // Then
-        assertThat(responseEntity.getStatusCode().is4xxClientError()).isTrue();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(responseEntity.getBody()).isInstanceOf(MessageResponse.class);
 
         MessageResponse messageResponse = (MessageResponse) responseEntity.getBody();

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public class TeacherControllerIntegrationTest {
         ResponseEntity<?> responseEntity = teacherController.findById(String.valueOf(teacherSaved.getId()));
 
         // Then
-        assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isInstanceOf(TeacherDto.class);
 
         TeacherDto teacherDto = (TeacherDto) responseEntity.getBody();
@@ -68,7 +69,7 @@ public class TeacherControllerIntegrationTest {
         ResponseEntity<?> responseEntity = teacherController.findById(id);
 
         // Then
-        assertThat(responseEntity.getStatusCode().is4xxClientError()).isTrue();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(responseEntity.getBody()).isNull();
     }
 
@@ -94,7 +95,7 @@ public class TeacherControllerIntegrationTest {
         ResponseEntity<?> responseEntity = teacherController.findAll();
 
         // Then
-        assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isInstanceOf(List.class);
 
         List<TeacherDto> teacherDtos = (List<TeacherDto>) responseEntity.getBody();

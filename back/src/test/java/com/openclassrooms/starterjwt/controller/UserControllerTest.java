@@ -91,7 +91,7 @@ public class UserControllerTest {
         when(userService.findById(id)).thenReturn(null);
 
         // When
-        ResponseEntity<?> responseEntity = userController.save(String.valueOf(id));
+        ResponseEntity<?> responseEntity = userController.delete(String.valueOf(id));
 
         // Then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -105,7 +105,7 @@ public class UserControllerTest {
         String id = "badId";
 
         // When
-        ResponseEntity<?> responseEntity = userController.save(id);
+        ResponseEntity<?> responseEntity = userController.delete(id);
 
         // Then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
