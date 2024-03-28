@@ -168,7 +168,7 @@ public class SessionControllerTest {
         when(sessionService.getById(id)).thenReturn(session);
 
         // When
-        ResponseEntity<?> responseEntity = sessionController.save(String.valueOf(id));
+        ResponseEntity<?> responseEntity = sessionController.delete(String.valueOf(id));
 
         // Then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -184,7 +184,7 @@ public class SessionControllerTest {
         when(sessionService.getById(id)).thenReturn(null);
 
         // When
-        ResponseEntity<?> responseEntity = sessionController.save(String.valueOf(id));
+        ResponseEntity<?> responseEntity = sessionController.delete(String.valueOf(id));
 
         // Then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -199,7 +199,7 @@ public class SessionControllerTest {
         String id = "badId";
 
         // When
-        ResponseEntity<?> responseEntity = sessionController.save(id);
+        ResponseEntity<?> responseEntity = sessionController.delete(id);
 
         // Then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
