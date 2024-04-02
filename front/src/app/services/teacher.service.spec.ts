@@ -66,5 +66,4 @@ describe('TeacherService', () => {
     expect(req.request.method).toEqual('GET');
     req.flush(mockTeacher);
   });
-
 });

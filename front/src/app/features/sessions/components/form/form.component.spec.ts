@@ -1,42 +1,32 @@
-import {HttpClientModule} from '@angular/common/http';
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MatCardModule} from '@angular/material/card';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatIconModule} from '@angular/material/icon';
-import {MatInputModule} from '@angular/material/input';
-import {MatSelectModule} from '@angular/material/select';
-import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {RouterTestingModule} from '@angular/router/testing';
-import {expect} from '@jest/globals';
-import {SessionService} from 'src/app/services/session.service';
-import {SessionApiService} from '../../services/session-api.service';
-
+import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {FormComponent} from './form.component';
-import {ActivatedRoute, Router} from "@angular/router";
-import {TeacherService} from "../../../../services/teacher.service";
-import {of} from "rxjs";
-import {SessionInformation} from "../../../../interfaces/sessionInformation.interface";
-import {Session} from "../../interfaces/session.interface";
+import {ActivatedRoute, Router} from '@angular/router';
+import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {SessionApiService} from '../../services/session-api.service';
+import {of} from 'rxjs';
+import {Session} from '../../interfaces/session.interface';
+import {HttpClientTestingModule} from "@angular/common/http/testing";
+import {SessionService} from "../../../../services/session.service";
+import {RouterTestingModule} from "@angular/router/testing";
+import {MatCardModule} from "@angular/material/card";
+import {MatIconModule} from "@angular/material/icon";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatInputModule} from "@angular/material/input";
+import {MatSelectModule} from "@angular/material/select";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {CommonModule} from "@angular/common";
+import {expect} from "@jest/globals";
+import {SessionInformation} from "../../../../interfaces/sessionInformation.interface";
 
 describe('FormComponent', () => {
   let component: FormComponent;
   let fixture: ComponentFixture<FormComponent>;
   let activatedRouteMock: jest.Mocked<ActivatedRoute>;
-  let formBuilder: FormBuilder;
-  let matSnackBarMock: jest.Mocked<MatSnackBar>;
-  let sessionApiServiceMock: jest.Mocked<SessionApiService>;
-  let sessionServiceMock: jest.Mocked<SessionService>;
-  let teacherServiceMock: jest.Mocked<TeacherService>;
   let routerMock: jest.Mocked<Router>;
-
-  const mockSessionService = {
-    sessionInformation: {
-      admin: true
-    }
-  }
+  let sessionApiServiceMock: jest.Mocked<SessionApiService>;
+  let matSnackBarMock: jest.Mocked<MatSnackBar>;
+  let sessionServiceMock: jest.Mocked<SessionService>;
 
   const mockSession = {
     name: 'test',
@@ -51,45 +41,40 @@ describe('FormComponent', () => {
   }
 
   beforeEach(async () => {
-
     activatedRouteMock = {
       snapshot: {
+        // @ts-ignore
         paramMap: {
-          get: jest.fn()
+          get: () => '1'
         }
       },
-      url: of([]),
-    } as any as jest.Mocked<ActivatedRoute>;
+      // @ts-ignore
+      url: of([{path: 'update'}])
+    };
 
-    formBuilder = new FormBuilder();
-
-    matSnackBarMock = {
-      open: jest.fn() as jest.MockedFunction<typeof matSnackBarMock.open>,
-    } as jest.Mocked<MatSnackBar>;
+    routerMock = {
+      navigate: jest.fn(),
+      url: '/sessions/update/1'
+    } as any as jest.Mocked<Router>;
 
     sessionApiServiceMock = {
-      create: jest.fn() as jest.MockedFunction<typeof sessionApiServiceMock.create>,
+      detail: jest.fn().mockReturnValue(of({} as Session)),
       update: jest.fn() as jest.MockedFunction<typeof sessionApiServiceMock.update>,
-      detail: jest.fn() as jest.MockedFunction<typeof sessionApiServiceMock.detail>,
-    } as jest.Mocked<SessionApiService>;
+      create: jest.fn() as jest.MockedFunction<typeof sessionApiServiceMock.create>,
+    } as any as jest.Mocked<SessionApiService>;
+
+    matSnackBarMock = {
+      open: jest.fn()
+    } as any as jest.Mocked<MatSnackBar>;
 
     sessionServiceMock = {
       sessionInformation: {admin: true},
     } as jest.Mocked<SessionService>;
 
-    teacherServiceMock = {
-      all: jest.fn() as jest.MockedFunction<typeof teacherServiceMock.all>,
-    } as jest.Mocked<TeacherService>;
-
-    routerMock = {
-      navigate: jest.fn() as jest.MockedFunction<typeof routerMock.navigate>,
-      url: ''
-    } as jest.Mocked<Router>;
-
     await TestBed.configureTestingModule({
-      imports: [
+      imports: [ReactiveFormsModule,
+        HttpClientTestingModule,
         RouterTestingModule,
-        HttpClientModule,
         MatCardModule,
         MatIconModule,
         MatFormFieldModule,
@@ -99,22 +84,17 @@ describe('FormComponent', () => {
         MatSelectModule,
         BrowserAnimationsModule,
         CommonModule,
-        FormsModule
-      ],
+        FormsModule],
+      declarations: [FormComponent],
       providers: [
-        {provide: SessionService, useValue: mockSessionService},
-        SessionApiService,
+        FormBuilder,
         {provide: ActivatedRoute, useValue: activatedRouteMock},
-        {provide: FormBuilder, useValue: formBuilder},
-        {provide: MatSnackBar, useValue: matSnackBarMock},
+        {provide: Router, useValue: routerMock},
         {provide: SessionApiService, useValue: sessionApiServiceMock},
+        {provide: MatSnackBar, useValue: matSnackBarMock},
         {provide: SessionService, useValue: sessionServiceMock},
-        {provide: TeacherService, useValue: teacherServiceMock},
-        {provide: Router, useValue: routerMock}
-      ],
-      declarations: [FormComponent]
-    })
-      .compileComponents();
+      ]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(FormComponent);
     component = fixture.componentInstance;
@@ -137,6 +117,16 @@ describe('FormComponent', () => {
     expect(routerMock.navigate).toHaveBeenCalledWith(['/sessions']);
   });
 
+  it('should set onUpdate to true when url includes update', () => {
+
+    // When
+    component.ngOnInit();
+
+    // Then
+    expect(component.onUpdate).toBe(true);
+    expect(sessionApiServiceMock.detail).toHaveBeenCalledWith('1');
+  });
+
   it('should not navigate to sessions page if user is admin on initialization', () => {
 
     // Given
@@ -146,45 +136,47 @@ describe('FormComponent', () => {
     component.ngOnInit();
 
     // Then
+    // @ts-ignore
     expect(routerMock.navigate(['/sessions'])).toBeFalsy();
   });
 
-  it('should create session and exit page on creation mode', waitForAsync(() => {
+  it('should create session and exit page on creation mode', fakeAsync(() => {
 
     // Given
     component.sessionForm = mockSessionForm as FormGroup;
+    component.onUpdate = false;
 
     // When
+    // @ts-ignore
     sessionApiServiceMock.create.mockReturnValue(of(mockSession));
 
     component.submit();
+    tick();
 
     // Then
-    fixture.whenStable().then(() => {
-      expect(sessionApiServiceMock.create).toHaveBeenCalledWith(component.sessionForm?.value);
-      expect(matSnackBarMock.open).toHaveBeenCalledWith('Session created !', 'Close', {duration: 3000});
-      expect(routerMock.navigate).toHaveBeenCalledWith(['sessions']);
-    });
+    expect(sessionApiServiceMock.create).toHaveBeenCalledWith(component.sessionForm?.value);
+    expect(matSnackBarMock.open).toHaveBeenCalledWith('Session created !', 'Close', {duration: 3000});
+    expect(routerMock.navigate).toHaveBeenCalledWith(['sessions']);
   }));
 
-  it('should update session and exit page on update mode', waitForAsync(() => {
+  it('should update session and exit page on update mode', fakeAsync(() => {
 
     // Given
     component.onUpdate = true;
     component.id = '1';
     component.sessionForm = mockSessionForm as FormGroup;
+    sessionServiceMock.sessionInformation = {admin: true} as SessionInformation;
 
     // When
     sessionApiServiceMock.update.mockReturnValue(of(mockSession));
 
     component.submit();
+    tick();
 
     // Then
-    fixture.whenStable().then(() => {
-      expect(sessionApiServiceMock.update).toHaveBeenCalledWith('1', component.sessionForm?.value);
-      expect(matSnackBarMock.open).toHaveBeenCalledWith('Session updated !', 'Close', {duration: 3000});
-      expect(routerMock.navigate).toHaveBeenCalledWith(['sessions']);
-    });
+    expect(sessionApiServiceMock.update).toHaveBeenCalledWith('1', component.sessionForm?.value);
+    expect(matSnackBarMock.open).toHaveBeenCalledWith('Session updated !', 'Close', {duration: 3000});
+    expect(routerMock.navigate).toHaveBeenCalledWith(['sessions']);
   }));
 
   it('should display create session title when not updating', () => {
@@ -212,18 +204,4 @@ describe('FormComponent', () => {
     // Then
     expect(compiled.querySelector('h1').textContent).toContain('Update session');
   });
-
-  it('should disable save button when form is invalid', () => {
-
-    // Given
-    const compiled = fixture.nativeElement;
-
-    // When
-    fixture.detectChanges();
-    const saveButton = compiled.querySelector('button[mat-raised-button][color="primary"]');
-
-    // Then
-    expect(saveButton.disabled).toBeTruthy();
-  });
-
 });

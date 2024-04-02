@@ -6,7 +6,7 @@
           <button mat-icon-button (click)="back()">
             <mat-icon>arrow_back</mat-icon>
           </button>
-          <h1>{{session.name | titlecase}}</h1>
+          <h1>{{ session.name | titlecase }}</h1>
         </div>
         <div>
           <button *ngIf="isAdmin" mat-raised-button color="warn" (click)="delete()">
@@ -52,7 +52,7 @@
           <mat-icon>
             calendar_month
           </mat-icon>
-          <span class="ml1">{{ session.date | date: 'longDate'}}</span>
+          <span class="ml1">{{ session.date | date: 'longDate' }}</span>
         </div>
       </div>
       <div class="description">
@@ -61,8 +61,8 @@
         <br>
       </div>
       <div class="date" class="my2" fxLayout="row" fxLayoutAlign="space-between center">
-        <div class="created"><i>Create at: </i> {{ session.createdAt| date: 'longDate'}}</div>
-        <div class="updated"><i>Last update: </i> {{ session.updatedAt| date: 'longDate'}}</div>
+        <div class="created"><i>Create at: </i> {{ session.createdAt| date: 'longDate' }}</div>
+        <div class="updated"><i>Last update: </i> {{ session.updatedAt| date: 'longDate' }}</div>
       </div>
     </mat-card-content>
   </mat-card>

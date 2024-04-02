@@ -167,5 +167,4 @@ describe('RegisterComponent', () => {
     // Then
     expect(routerMock.navigate).toHaveBeenCalledWith(['/login']);
   });
-
 });
