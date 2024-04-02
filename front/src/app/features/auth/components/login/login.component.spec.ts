@@ -27,7 +27,7 @@ describe('LoginComponent', () => {
     id: 1
   }
 
-  const loginRequest= {
+  const loginRequest = {
     email: 'test@test.com',
     password: 'user1234'
   }

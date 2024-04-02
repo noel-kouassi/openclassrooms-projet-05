@@ -1,5 +1,5 @@
 import {HttpClientModule} from '@angular/common/http';
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {RouterTestingModule} from '@angular/router/testing';
 import {expect} from '@jest/globals';

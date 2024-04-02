@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
-import { User } from '../../interfaces/user.interface';
-import { SessionService } from '../../services/session.service';
-import { UserService } from '../../services/user.service';
+import {Component, OnInit} from '@angular/core';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {Router} from '@angular/router';
+import {User} from '../../interfaces/user.interface';
+import {SessionService} from '../../services/session.service';
+import {UserService} from '../../services/user.service';
 
 @Component({
   selector: 'app-me',
@@ -34,7 +34,7 @@ export class MeComponent implements OnInit {
     this.userService
       .delete(this.sessionService.sessionInformation!.id.toString())
       .subscribe((_) => {
-        this.matSnackBar.open("Your account has been deleted !", 'Close', { duration: 3000 });
+        this.matSnackBar.open("Your account has been deleted !", 'Close', {duration: 3000});
         this.sessionService.logOut();
         this.router.navigate(['/']);
       })

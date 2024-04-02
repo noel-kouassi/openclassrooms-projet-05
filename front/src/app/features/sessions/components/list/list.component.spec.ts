@@ -1,5 +1,5 @@
 import {HttpClientModule} from '@angular/common/http';
-import {ComponentFixture, fakeAsync, TestBed, waitForAsync} from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {MatCardModule} from '@angular/material/card';
 import {MatIconModule} from '@angular/material/icon';
 import {expect} from '@jest/globals';
@@ -98,5 +98,4 @@ describe('ListComponent', () => {
     // Then
     expect(createButton).toBeFalsy();
   });
-
 });

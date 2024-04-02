@@ -140,5 +140,4 @@ describe('SessionApiService', () => {
     expect(req.request.method).toEqual('DELETE');
     req.flush(null);
   });
-
 });

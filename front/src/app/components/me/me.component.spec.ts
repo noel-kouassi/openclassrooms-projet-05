@@ -80,7 +80,6 @@ describe('MeComponent', () => {
 
     // When
     userServiceMock.getById.mockReturnValue(of(mockUser));
-
     component.ngOnInit();
 
     // Then
@@ -89,7 +88,6 @@ describe('MeComponent', () => {
     setTimeout(() => {
       expect(component.user).toEqual(mockUser);
     }, 1000);
-
   });
 
   it('should go back in navigation on back function execution', () => {

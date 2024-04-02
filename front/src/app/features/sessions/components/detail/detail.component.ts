@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Teacher } from '../../../../interfaces/teacher.interface';
-import { SessionService } from '../../../../services/session.service';
-import { TeacherService } from '../../../../services/teacher.service';
-import { Session } from '../../interfaces/session.interface';
-import { SessionApiService } from '../../services/session-api.service';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder} from '@angular/forms';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Teacher} from '../../../../interfaces/teacher.interface';
+import {SessionService} from '../../../../services/session.service';
+import {TeacherService} from '../../../../services/teacher.service';
+import {Session} from '../../interfaces/session.interface';
+import {SessionApiService} from '../../services/session-api.service';
 
 @Component({
   selector: 'app-detail',
@@ -48,7 +48,7 @@ export class DetailComponent implements OnInit {
     this.sessionApiService
       .delete(this.sessionId)
       .subscribe((_: any) => {
-          this.matSnackBar.open('Session deleted !', 'Close', { duration: 3000 });
+          this.matSnackBar.open('Session deleted !', 'Close', {duration: 3000});
           this.router.navigate(['sessions']);
         }
       );
@@ -73,5 +73,4 @@ export class DetailComponent implements OnInit {
           .subscribe((teacher: Teacher) => this.teacher = teacher);
       });
   }
-
 }
